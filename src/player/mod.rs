@@ -1,9 +1,9 @@
 pub type PlayerId = usize;
-pub mod asking_player;
+pub mod ask_action;
 pub mod player_action;
-pub use asking_player::AskingPlayer;
+pub use ask_action::AskAction;
 pub use player_action::PlayerAction;
 
 pub trait PlayerController {
-    fn ask_player_action(&self, asking_player: AskingPlayer) -> PlayerAction;
+    fn ask_player_action(&self, ask_action: AskAction) -> PlayerAction;
 }
