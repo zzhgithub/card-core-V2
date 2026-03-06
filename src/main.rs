@@ -3,6 +3,7 @@ mod config;
 mod effect;
 mod game;
 mod lua_api;
+mod player;
 
 use config::AppConfig;
 use lua_api::lua_api::LuaApi;
@@ -42,4 +43,13 @@ fn main() {
             eprintln!("加载卡片定义时出错: {}", e);
         }
     }
+
+    // 初始化一个新的游戏实例
+    let game = game::game::Game {
+        current_phase: game::game_phase::GamePhase::Start,
+        players: vec![],
+        current_player_id: 0,
+    };
+
+    println!("Created game instance with phase: {:?}", game.current_phase);
 }
