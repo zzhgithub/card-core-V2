@@ -1,0 +1,12 @@
+[package]
+name = "card-ai"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+mlua = { version = "0.11.6", features = ["lua54", "vendored", "serialize", "async"] }
+toml = "0.8.19"  # 最近发布的版本
+serde = { version = "1.0.228", features = ["derive"] } # 最新版本
+
+[dev-dependencies]
+tempfile = "3.0"
