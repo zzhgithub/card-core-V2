@@ -13,7 +13,7 @@ use entity::IdGenerator;
 use lua_api::lua_api::LuaApi;
 
 fn main() {
-    let config_file_path = "config.toml";
+    let config_file_path = "rule.toml";
     let app_config = if std::path::Path::new(config_file_path).exists() {
         AppConfig::load_from_file(config_file_path).expect("Failed to load config from TOML file")
     } else {
@@ -63,6 +63,10 @@ fn main() {
                                 println!("玩家1卡组实体数量: {}", game.player_decks[0].len());
                                 println!("玩家2卡组实体数量: {}", game.player_decks[1].len());
                                 println!("总卡片实体数量: {}", game.card_entities.len());
+
+                                let total_deck_cards =
+                                    game.player_decks[0].len() + game.player_decks[1].len();
+                                println!("不去重的卡片数量总和: {}", total_deck_cards);
                             }
                             Err(e) => {
                                 eprintln!("创建游戏失败: {:?}", e);
