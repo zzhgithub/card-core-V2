@@ -1,3 +1,4 @@
+use crate::desk::DeckConfig as DeskConfiguration;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
@@ -5,7 +6,7 @@ use std::path::Path;
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct AppConfig {
     pub lua_scripts: LuaScriptsConfig,
-    // 将来的其他配置可以添加到这里,如游戏参数等
+    pub deck_config: DeskConfiguration,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -17,14 +18,6 @@ impl Default for LuaScriptsConfig {
     fn default() -> Self {
         Self {
             script_directory: "lua".to_string(),
-        }
-    }
-}
-
-impl Default for AppConfig {
-    fn default() -> Self {
-        Self {
-            lua_scripts: LuaScriptsConfig::default(),
         }
     }
 }
@@ -43,6 +36,9 @@ impl AppConfig {
     }
 
     pub fn new_from_default() -> Self {
-        Self::default()
+        Self {
+            lua_scripts: LuaScriptsConfig::default(),
+            deck_config: DeskConfiguration::default(),
+        }
     }
 }

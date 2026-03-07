@@ -1,0 +1,8 @@
+card_define("S000-C-017", function(card) 
+    card:name("Character Card 017")
+    card:card_type("character")
+    card:attribute("rationality") 
+    card:category("math")
+    card:cost(4)
+    card:attack(547)
+end)
