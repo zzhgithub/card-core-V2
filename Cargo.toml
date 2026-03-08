@@ -7,6 +7,7 @@ edition = "2024"
 mlua = { version = "0.11.6", features = ["lua54", "vendored", "serialize", "async"] }
 toml = "1.0.4+spec-1.1.0"  # 最近发布的版本
 serde = { version = "1.0.228", features = ["derive"] } # 最新版本
+rand = "0.9"
 
 [dev-dependencies]
 tempfile = "3.0"

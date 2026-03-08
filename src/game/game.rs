@@ -1,16 +1,18 @@
 use crate::desk::{Deck, DeckConfig, DeckValidationError};
-use crate::entity::{CardEntity, IdGenerator};
+use crate::entity::{CardEntity, CardEntityId, IdGenerator};
 use crate::game::game_phase::GamePhase;
 use crate::lua_api::lua_api::LuaApi;
-use crate::player::{PlayerController, PlayerId};
+use crate::player::{PlayerController, PlayerId, PlayerZones};
+use rand::seq::SliceRandom;
 use std::collections::HashMap;
 
 pub struct Game {
     pub current_phase: GamePhase,
     pub players: Vec<Box<dyn PlayerController>>,
     pub current_player_id: PlayerId,
-    pub card_entities: HashMap<u64, CardEntity>,
+    pub card_entities: HashMap<CardEntityId, CardEntity>,
     pub player_decks: Vec<Vec<u64>>,
+    pub player_zones: Vec<PlayerZones>,
     id_generator: IdGenerator,
 }
 
@@ -45,9 +47,9 @@ impl Game {
             .validate(deck_config, &available_card_ids)
             .map_err(GameNewError::DeckValidation)?;
 
-        let mut card_entities: HashMap<u64, CardEntity> = HashMap::new();
-        let mut player1_entity_ids: Vec<u64> = Vec::new();
-        let mut player2_entity_ids: Vec<u64> = Vec::new();
+        let mut card_entities: HashMap<CardEntityId, CardEntity> = HashMap::new();
+        let mut player1_entity_ids: Vec<CardEntityId> = Vec::new();
+        let mut player2_entity_ids: Vec<CardEntityId> = Vec::new();
 
         for card_id in &player1_deck.card_ids {
             let card_def = lua_api
@@ -71,12 +73,34 @@ impl Game {
             card_entities.insert(entity_id, entity);
         }
 
+        // Shuffle the player decks randomly
+        let mut rng = rand::thread_rng();
+        player1_entity_ids.shuffle(&mut rng);
+        player2_entity_ids.shuffle(&mut rng);
+
+        let mut player_zones = vec![PlayerZones::new(5), PlayerZones::new(5)];
+
+        for _ in 0..5 {
+            if let Some(card_id) = player1_entity_ids.pop() {
+                if let Err(_) = player_zones[0].add_to_hand(card_id) {
+                    player1_entity_ids.push(card_id);
+                }
+            }
+
+            if let Some(card_id) = player2_entity_ids.pop() {
+                if let Err(_) = player_zones[1].add_to_hand(card_id) {
+                    player2_entity_ids.push(card_id);
+                }
+            }
+        }
+
         Ok(Self {
             current_phase: GamePhase::Start,
             players: vec![controller1, controller2],
             current_player_id: 0,
             card_entities,
             player_decks: vec![player1_entity_ids, player2_entity_ids],
+            player_zones,
             id_generator: id_gen,
         })
     }
