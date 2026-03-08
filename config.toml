@@ -1,9 +1,0 @@
-[lua_scripts]
-script_directory = "lua"
-
-[deck_config]
-min_size = 20
-max_size = 60
-max_copies_per_card = 3
-require_core_cards = false
-core_card_ids = []
