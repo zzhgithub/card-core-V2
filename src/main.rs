@@ -54,11 +54,15 @@ fn main() {
                         match game::game::Game::new(
                             example_deck.clone(), // player1_deck_ids
                             example_deck.clone(), // player2_deck_ids (for demo)
+                            Box::new(
+                                crate::player::cli_controller::CommandLinePlayerController::new(),
+                            ),
+                            Box::new(crate::player::ai_controller::AIPlayerController::new(5)),
                             &lua_api,
                             id_generator,
                             &app_config.deck_config,
                         ) {
-                            Ok(game) => {
+                            Ok(mut game) => {
                                 println!("游戏创建成功！当前阶段: {:?}", game.current_phase);
                                 println!("玩家1卡组实体数量: {}", game.player_decks[0].len());
                                 println!("玩家2卡组实体数量: {}", game.player_decks[1].len());
@@ -67,6 +71,10 @@ fn main() {
                                 let total_deck_cards =
                                     game.player_decks[0].len() + game.player_decks[1].len();
                                 println!("不去重的卡片数量总和: {}", total_deck_cards);
+
+                                if let Err(e) = game.run() {
+                                    eprintln!("游戏运行错误: {}", e);
+                                }
                             }
                             Err(e) => {
                                 eprintln!("创建游戏失败: {:?}", e);

@@ -24,6 +24,8 @@ impl Game {
     pub fn new(
         player1_deck_ids: Vec<String>,
         player2_deck_ids: Vec<String>,
+        controller1: Box<dyn PlayerController>,
+        controller2: Box<dyn PlayerController>,
         lua_api: &LuaApi,
         id_generator: IdGenerator,
         deck_config: &DeckConfig,
@@ -71,11 +73,107 @@ impl Game {
 
         Ok(Self {
             current_phase: GamePhase::Start,
-            players: vec![],
+            players: vec![controller1, controller2],
             current_player_id: 0,
             card_entities,
             player_decks: vec![player1_entity_ids, player2_entity_ids],
             id_generator: id_gen,
         })
+    }
+
+    pub fn run(&mut self) -> Result<(), String> {
+        let start_time = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_err(|e| e.to_string())?;
+
+        let first_player_index = (start_time.subsec_nanos() & 1) as PlayerId;
+        self.current_player_id = first_player_index;
+
+        println!(
+            "Starting game with player {} as first player",
+            self.current_player_id
+        );
+
+        loop {
+            match self.current_phase {
+                crate::game::game_phase::GamePhase::Start => {
+                    println!("Current phase: Start");
+                    self.current_phase = crate::game::game_phase::GamePhase::Draw;
+                    let action = self.players[self.current_player_id]
+                        .ask_player_action(crate::player::AskAction::CurrentPlayer);
+                    println!(
+                        "Player {} performed action: {:?}",
+                        self.current_player_id, action
+                    );
+                }
+                crate::game::game_phase::GamePhase::Draw => {
+                    println!("Current phase: Draw");
+                    self.current_phase = crate::game::game_phase::GamePhase::Recycle;
+
+                    let action = self.players[self.current_player_id]
+                        .ask_player_action(crate::player::AskAction::CurrentPlayer);
+                    println!(
+                        "Player {} performed action: {:?}",
+                        self.current_player_id, action
+                    );
+                }
+                crate::game::game_phase::GamePhase::Recycle => {
+                    println!("Current phase: Recycle");
+                    self.current_phase = crate::game::game_phase::GamePhase::MainPhase1;
+
+                    let action = self.players[self.current_player_id]
+                        .ask_player_action(crate::player::AskAction::CurrentPlayer);
+                    println!(
+                        "Player {} performed action: {:?}",
+                        self.current_player_id, action
+                    );
+                }
+                crate::game::game_phase::GamePhase::MainPhase1 => {
+                    println!("Current phase: MainPhase1");
+                    self.current_phase = crate::game::game_phase::GamePhase::Battle;
+
+                    let action = self.players[self.current_player_id]
+                        .ask_player_action(crate::player::AskAction::CurrentPlayer);
+                    println!(
+                        "Player {} performed action: {:?}",
+                        self.current_player_id, action
+                    );
+                }
+                crate::game::game_phase::GamePhase::Battle => {
+                    println!("Current phase: Battle");
+                    self.current_phase = crate::game::game_phase::GamePhase::MainPhase2;
+
+                    let action = self.players[self.current_player_id]
+                        .ask_player_action(crate::player::AskAction::CurrentPlayer);
+                    println!(
+                        "Player {} performed action: {:?}",
+                        self.current_player_id, action
+                    );
+                }
+                crate::game::game_phase::GamePhase::MainPhase2 => {
+                    println!("Current phase: MainPhase2");
+                    self.current_phase = crate::game::game_phase::GamePhase::End;
+
+                    let action = self.players[self.current_player_id]
+                        .ask_player_action(crate::player::AskAction::CurrentPlayer);
+                    println!(
+                        "Player {} performed action: {:?}",
+                        self.current_player_id, action
+                    );
+                }
+                crate::game::game_phase::GamePhase::End => {
+                    println!("Current phase: End game completed");
+                    self.current_phase = crate::game::game_phase::GamePhase::GameOver;
+                }
+                crate::game::game_phase::GamePhase::GameOver => {
+                    println!("Game over reached!");
+                    break;
+                }
+            }
+
+            self.current_player_id = (self.current_player_id + 1) % self.players.len();
+        }
+
+        Ok(())
     }
 }

@@ -15,4 +15,5 @@ pub enum GamePhase {
     MainPhase2,
     /// 结束阶段
     End,
+    GameOver,
 }
