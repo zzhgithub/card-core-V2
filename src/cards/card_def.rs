@@ -1,9 +1,10 @@
 use crate::effect::effect_def::Effect;
 use mlua::UserData;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// 卡片类型枚举
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum CardType {
     /// 人物卡
     Character,
@@ -16,7 +17,7 @@ pub enum CardType {
 }
 
 /// 卡片属性枚举（理性、神性、灵性）
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum CardAttribute {
     /// 理性
     Rationality,
