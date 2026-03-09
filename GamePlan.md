@@ -18,7 +18,7 @@
 
 
 # Effect计划
-- [ ] 重新设计Effect
+- [x] 重新设计Effect
 pub struct Effect {
   pub trigger: Trigger,              // 时点
   pub optional: bool,                // 是否“可以发动” 
