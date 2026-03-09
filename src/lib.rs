@@ -4,7 +4,7 @@ mod desk;
 mod effect;
 mod entity;
 mod game;
-mod lua_api;
+pub mod lua_api;
 mod player;
 
 pub use cards::*;

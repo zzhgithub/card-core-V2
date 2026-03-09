@@ -208,7 +208,7 @@ pub enum Action {
     GainControl(PlayerId, TargetSelector),              // 获取对对手卡片的控制权
     AddCardToHand(PlayerId, String),                    // 向手牌中添加特定卡片
     DiscardCards(PlayerId, u32),                        // 强制弃牌
-    GainLife(PlayerId, u32),                            // 增加最大HP
+    GainLife(PlayerId, u32),                            // 増加最大HP
     SetStatus(TargetSelector, StatusModifier),          // 应用状态条件
     Custom(String, Vec<String>),                        // 特殊情况行动
 }
@@ -239,7 +239,7 @@ pub enum CostChoice {
         target: PlayerId,
         required_count: u32,
         constraints: Option<CardConstraint>,
-    }, // 从特定区域支付卡片
+    }, // から特定区域支付カード
     PayRealPoints {
         amount: u32,
     }, // 支付真实点数
@@ -267,5 +267,5 @@ pub enum Cost {
     LifePoints {
         amount: u32,
     },
-    SpecificCard(u64), // 特定卡片必须被支付/牺牲
+    SpecificCard(u64), // 特定カード必须被支付/牺牲
 }

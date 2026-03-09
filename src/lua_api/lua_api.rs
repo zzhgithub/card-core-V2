@@ -1,7 +1,7 @@
 use crate::cards::card_def::Card;
+use crate::effect::effect_def::Effect;
 use mlua::Lua;
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
 
 pub struct LuaApi {
     /// 保存卡片ID到卡片定义的映射
@@ -25,7 +25,7 @@ impl LuaApi {
                 let api = unsafe { api_ptr.as_mut() };
                 let builder = crate::cards::card_def::CardBuilder::new().id(id.clone());
 
-                // 创建一个AnyUserdata，并传给回调函数
+                // 创建CardBuilder的AnyUserdata，并传给回调函数
                 let builder_ud = lua_ctx.create_userdata(builder)?;
 
                 // 执行回调函数，不期待返回值
@@ -46,7 +46,16 @@ impl LuaApi {
             },
         )?;
 
+        // 在全局注册创建Effect的函数
+        let create_effect_func =
+            lua.create_function(|lua_ctx, _: ()| -> mlua::Result<mlua::Value> {
+                let effect = Effect::new("Default Description".to_string(), "Custom".to_string());
+                let ud = lua_ctx.create_userdata(effect)?;
+                Ok(mlua::Value::UserData(ud))
+            })?;
+
         lua.globals().set("card_define", card_define)?;
+        lua.globals().set("createEffect", create_effect_func)?;
 
         Ok(())
     }

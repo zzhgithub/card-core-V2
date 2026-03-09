@@ -389,17 +389,14 @@ impl UserData for CardBuilder {
         });
 
         methods.add_method_mut(
-            "effect",
-            |_, builder, (key, description, effect_type): (String, String, String)| {
-                let effect = Effect::new(description, effect_type);
-                builder.effects.insert(key, effect);
+            "effect_from_user_data",
+            |lua_ctx, builder, (key, effect_ud): (String, mlua::AnyUserData)| {
+                if let Ok(effect) = effect_ud.borrow::<Effect>() {
+                    let effect_clone = (*effect).clone();
+                    builder.effects.insert(key, effect_clone);
+                }
                 Ok(())
             },
         );
-
-        methods.add_method_mut("field", |_, builder, (key, value): (String, String)| {
-            builder.fields.insert(key, value);
-            Ok(())
-        });
     }
 }
